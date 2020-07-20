@@ -1,0 +1,36 @@
+CREATE TABLE `country` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `region` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(60) NOT NULL,
+  `country` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_region_country_id` (`country`),
+  CONSTRAINT `fk_region_country_id` FOREIGN KEY (`country`) REFERENCES `country` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `district` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(60) NOT NULL,
+  `region` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_district_region_id_idx` (`region`),
+  CONSTRAINT `fk_district_region_id` FOREIGN KEY (`region`) REFERENCES `region` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `town` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `district` int unsigned DEFAULT NULL,
+  `region` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_town_region_id_idx` (`region`),
+  KEY `fk_town_district_id_idx` (`district`),
+  CONSTRAINT `fk_town_district_id` FOREIGN KEY (`district`) REFERENCES `district` (`id`),
+  CONSTRAINT `fk_town_region_id` FOREIGN KEY (`region`) REFERENCES `region` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
