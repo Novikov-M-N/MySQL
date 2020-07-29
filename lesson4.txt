@@ -1,0 +1,52 @@
+# 1. Создать VIEW на основе запросов, которые вы сделали в ДЗ к уроку 3 (1 шт).
+# Возьмём запрос, выводящий количество сотрудников в отделах
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `admin`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `dept_emp_count` AS
+    SELECT 
+        COUNT(`emp`.`emp_no`) AS `emp_count`,
+        `dept`.`dept_name` AS `dept_name`
+    FROM
+        (`dept_emp` `emp`
+        JOIN `departments` `dept` ON ((`dept`.`dept_no` = `emp`.`dept_no`)))
+    WHERE
+        (`emp`.`to_date` = '9999-01-01')
+    GROUP BY `dept`.`dept_no`
+	
+# 2. Создать функцию, которая найдет менеджера по имени и фамилии.
+CREATE DEFINER=`admin`@`localhost`
+FUNCTION `mgr_from_name`(firstName VARCHAR(14), lastName VARCHAR(16)) RETURNS INT
+    DETERMINISTIC
+BEGIN
+	DECLARE managerNumber INT;
+	SELECT
+		employee.emp_no INTO managerNumber
+	FROM
+		dept_manager AS manager
+	JOIN
+		employees AS employee ON employee.emp_no = manager.emp_no
+	WHERE
+		employee.first_name = firstName
+	AND
+		employee.last_name = lastName
+	AND
+		manager.to_date = '9999-01-01'
+	LIMIT 1;
+RETURN managerNumber;
+END
+
+# 3. Создать триггер, который при добавлении нового сотрудника будет выплачивать ему вступительный бонус, занося запись об этом в таблицу salary.
+CREATE DEFINER=`admin`@`localhost`
+TRIGGER `employees_AFTER_INSERT` AFTER INSERT ON `employees` FOR EACH ROW
+BEGIN
+	INSERT INTO
+		salaries (emp_no, salary, from_date, to_date)
+	VALUES(
+		NEW.emp_no,
+        1000,
+        curdate(),
+        curdate()
+	);
+END
